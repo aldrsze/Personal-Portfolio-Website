@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient-start: {{ data.theme.bg_gradient_start }};
+            --bg-gradient-end: {{ data.theme.bg_gradient_end }};
+            --accent-color: {{ data.theme.accent_color }};
+            --accent-hover: {{ data.theme.accent_hover }};
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <div class="dashboard-sidebar">
+            <h2>&lt;Admin/&gt;</h2>
+            <div class="sidebar-nav">
+                <a href="#stats"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="#customization"><i class="fas fa-palette"></i> Customization</a>
+                <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                <a href="/" target="_blank"><i class="fas fa-external-link-alt"></i> View Site</a>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="dashboard-header">
+                <h1>Admin Dashboard</h1>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Dashboard Statistics -->
+            <div id="stats" class="stats-grid">
+                <div class="stat-card">
+                    <h3><i class="fas fa-eye"></i> Total Visits</h3>
+                    <p>{{ data.visits }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-heart"></i> Likes</h3>
+                    <p>{{ data.likes }}</p>
+                </div>
+            </div>
+
+            <!-- Page Customization -->
+            <div id="customization" style="margin-top: 40px;">
+                <h2 style="margin-bottom: 24px; color: var(--text-primary);">Page Customization</h2>
+            
+                <!-- Theme Settings Section -->
+                <div class="section-container">
+                    <h2><i class="fas fa-palette"></i> Theme Settings</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 24px;">Choose a color scheme for your portfolio</p>
+                    
+                    <form action="/admin/update-theme" method="POST" class="theme-selector">
+                        <div class="theme-scroll-container">
+                            <button type="button" class="theme-scroll-btn left" onclick="scrollThemes('left')">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="theme-grid" id="themeGrid">
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'rose' else '' }}">
+                                <input type="radio" name="theme_name" value="rose" {{ 'checked' if data.theme.theme_name == 'rose' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #ffe4e6;"></span>
+                                        <span style="background: #fecaca;"></span>
+                                        <span style="background: #f43f5e;"></span>
+                                    </div>
+                                    <div class="theme-name">Rose & Coral</div>
+                                    <div class="theme-desc">Warm & Friendly</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'blue' else '' }}">
+                                <input type="radio" name="theme_name" value="blue" {{ 'checked' if data.theme.theme_name == 'blue' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #dbeafe;"></span>
+                                        <span style="background: #bfdbfe;"></span>
+                                        <span style="background: #3b82f6;"></span>
+                                    </div>
+                                    <div class="theme-name">Deep Blue</div>
+                                    <div class="theme-desc">Professional & Tech</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'emerald' else '' }}">
+                                <input type="radio" name="theme_name" value="emerald" {{ 'checked' if data.theme.theme_name == 'emerald' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #d1fae5;"></span>
+                                        <span style="background: #a7f3d0;"></span>
+                                        <span style="background: #10b981;"></span>
+                                    </div>
+                                    <div class="theme-name">Emerald</div>
+                                    <div class="theme-desc">Modern & Fresh</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'orange' else '' }}">
+                                <input type="radio" name="theme_name" value="orange" {{ 'checked' if data.theme.theme_name == 'orange' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #fed7aa;"></span>
+                                        <span style="background: #fdba74;"></span>
+                                        <span style="background: #f97316;"></span>
+                                    </div>
+                                    <div class="theme-name">Orange</div>
+                                    <div class="theme-desc">Bold & Dynamic</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'cyan' else '' }}">
+                                <input type="radio" name="theme_name" value="cyan" {{ 'checked' if data.theme.theme_name == 'cyan' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #cffafe;"></span>
+                                        <span style="background: #a5f3fc;"></span>
+                                        <span style="background: #06b6d4;"></span>
+                                    </div>
+                                    <div class="theme-name">Cyan</div>
+                                    <div class="theme-desc">Tech & Modern</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'purple' else '' }}">
+                                <input type="radio" name="theme_name" value="purple" {{ 'checked' if data.theme.theme_name == 'purple' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #ddd6fe;"></span>
+                                        <span style="background: #c4b5fd;"></span>
+                                        <span style="background: #8b5cf6;"></span>
+                                    </div>
+                                    <div class="theme-name">Purple</div>
+                                    <div class="theme-desc">Creative & Unique</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'sunset' else '' }}">
+                                <input type="radio" name="theme_name" value="sunset" {{ 'checked' if data.theme.theme_name == 'sunset' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #fef3c7;"></span>
+                                        <span style="background: #fca5a5;"></span>
+                                        <span style="background: #dc2626;"></span>
+                                    </div>
+                                    <div class="theme-name">Sunset</div>
+                                    <div class="theme-desc">Vibrant & Energetic</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'ocean' else '' }}">
+                                <input type="radio" name="theme_name" value="ocean" {{ 'checked' if data.theme.theme_name == 'ocean' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #e0f2fe;"></span>
+                                        <span style="background: #7dd3fc;"></span>
+                                        <span style="background: #0284c7;"></span>
+                                    </div>
+                                    <div class="theme-name">Ocean</div>
+                                    <div class="theme-desc">Deep & Calm</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'mint' else '' }}">
+                                <input type="radio" name="theme_name" value="mint" {{ 'checked' if data.theme.theme_name == 'mint' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #ecfdf5;"></span>
+                                        <span style="background: #a7f3d0;"></span>
+                                        <span style="background: #059669;"></span>
+                                    </div>
+                                    <div class="theme-name">Mint</div>
+                                    <div class="theme-desc">Clean & Crisp</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'lavender' else '' }}">
+                                <input type="radio" name="theme_name" value="lavender" {{ 'checked' if data.theme.theme_name == 'lavender' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #f5f3ff;"></span>
+                                        <span style="background: #ddd6fe;"></span>
+                                        <span style="background: #7c3aed;"></span>
+                                    </div>
+                                    <div class="theme-name">Lavender</div>
+                                    <div class="theme-desc">Elegant & Soft</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'peach' else '' }}">
+                                <input type="radio" name="theme_name" value="peach" {{ 'checked' if data.theme.theme_name == 'peach' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #fff7ed;"></span>
+                                        <span style="background: #fed7aa;"></span>
+                                        <span style="background: #ea580c;"></span>
+                                    </div>
+                                    <div class="theme-name">Peach</div>
+                                    <div class="theme-desc">Warm & Inviting</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'midnight' else '' }}">
+                                <input type="radio" name="theme_name" value="midnight" {{ 'checked' if data.theme.theme_name == 'midnight' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #e0e7ff;"></span>
+                                        <span style="background: #a5b4fc;"></span>
+                                        <span style="background: #4f46e5;"></span>
+                                    </div>
+                                    <div class="theme-name">Midnight</div>
+                                    <div class="theme-desc">Bold & Striking</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'ruby' else '' }}">
+                                <input type="radio" name="theme_name" value="ruby" {{ 'checked' if data.theme.theme_name == 'ruby' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #ffe4e6;"></span>
+                                        <span style="background: #fda4af;"></span>
+                                        <span style="background: #be123c;"></span>
+                                    </div>
+                                    <div class="theme-name">Ruby</div>
+                                    <div class="theme-desc">Rich & Deep</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'forest' else '' }}">
+                                <input type="radio" name="theme_name" value="forest" {{ 'checked' if data.theme.theme_name == 'forest' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #f0fdf4;"></span>
+                                        <span style="background: #86efac;"></span>
+                                        <span style="background: #15803d;"></span>
+                                    </div>
+                                    <div class="theme-name">Forest</div>
+                                    <div class="theme-desc">Natural & Earthy</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'amber' else '' }}">
+                                <input type="radio" name="theme_name" value="amber" {{ 'checked' if data.theme.theme_name == 'amber' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #fffbeb;"></span>
+                                        <span style="background: #fde68a;"></span>
+                                        <span style="background: #d97706;"></span>
+                                    </div>
+                                    <div class="theme-name">Amber</div>
+                                    <div class="theme-desc">Golden & Luxe</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'sky' else '' }}">
+                                <input type="radio" name="theme_name" value="sky" {{ 'checked' if data.theme.theme_name == 'sky' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #f0f9ff;"></span>
+                                        <span style="background: #bae6fd;"></span>
+                                        <span style="background: #0369a1;"></span>
+                                    </div>
+                                    <div class="theme-name">Sky</div>
+                                    <div class="theme-desc">Bright & Airy</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'fuchsia' else '' }}">
+                                <input type="radio" name="theme_name" value="fuchsia" {{ 'checked' if data.theme.theme_name == 'fuchsia' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #fdf4ff;"></span>
+                                        <span style="background: #f0abfc;"></span>
+                                        <span style="background: #c026d3;"></span>
+                                    </div>
+                                    <div class="theme-name">Fuchsia</div>
+                                    <div class="theme-desc">Vibrant & Fun</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'teal' else '' }}">
+                                <input type="radio" name="theme_name" value="teal" {{ 'checked' if data.theme.theme_name == 'teal' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #f0fdfa;"></span>
+                                        <span style="background: #5eead4;"></span>
+                                        <span style="background: #0f766e;"></span>
+                                    </div>
+                                    <div class="theme-name">Teal</div>
+                                    <div class="theme-desc">Balanced & Cool</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'crimson' else '' }}">
+                                <input type="radio" name="theme_name" value="crimson" {{ 'checked' if data.theme.theme_name == 'crimson' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #fef2f2;"></span>
+                                        <span style="background: #fecaca;"></span>
+                                        <span style="background: #991b1b;"></span>
+                                    </div>
+                                    <div class="theme-name">Crimson</div>
+                                    <div class="theme-desc">Intense & Powerful</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'slate' else '' }}">
+                                <input type="radio" name="theme_name" value="slate" {{ 'checked' if data.theme.theme_name == 'slate' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #f8fafc;"></span>
+                                        <span style="background: #cbd5e1;"></span>
+                                        <span style="background: #334155;"></span>
+                                    </div>
+                                    <div class="theme-name">Slate</div>
+                                    <div class="theme-desc">Minimal & Sleek</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'lime' else '' }}">
+                                <input type="radio" name="theme_name" value="lime" {{ 'checked' if data.theme.theme_name == 'lime' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #f7fee7;"></span>
+                                        <span style="background: #bef264;"></span>
+                                        <span style="background: #65a30d;"></span>
+                                    </div>
+                                    <div class="theme-name">Lime</div>
+                                    <div class="theme-desc">Fresh & Zesty</div>
+                                </div>
+                            </label>
+
+                            <label class="theme-option {{ 'active' if data.theme.theme_name == 'indigo' else '' }}">
+                                <input type="radio" name="theme_name" value="indigo" {{ 'checked' if data.theme.theme_name == 'indigo' else '' }}>
+                                <div class="theme-preview">
+                                    <div class="theme-colors">
+                                        <span style="background: #eef2ff;"></span>
+                                        <span style="background: #a5b4fc;"></span>
+                                        <span style="background: #4338ca;"></span>
+                                    </div>
+                                    <div class="theme-name">Indigo</div>
+                                    <div class="theme-desc">Classic & Timeless</div>
+                                </div>
+                            </label>
+                            <button type="button" class="theme-scroll-btn right" onclick="scrollThemes('right')">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="apply-theme-btn"><i class="fas fa-palette"></i> Apply Theme</button>
+                    </form>
+                </div>
+
+                <!-- Personal Info Section -->
+                <div class="section-container">
+                    <h2><i class="fas fa-user"></i> Personal Info</h2>
+                    <form action="/admin/update-personal-info" method="POST" class="dashboard-form" enctype="multipart/form-data">
+                        <input type="text" name="name" value="{{ data.personal_info.name }}" placeholder="Name" required>
+                        <input type="text" name="intro" value="{{ data.personal_info.intro }}" placeholder="Intro" required>
+                        <textarea name="career_objective" placeholder="Career Objective">{{ data.personal_info.career_objective }}</textarea>
+                        <input type="email" name="email" value="{{ data.personal_info.email }}" placeholder="Email" required>
+                        <input type="text" name="facebook" value="{{ data.personal_info.facebook }}" placeholder="Facebook URL">
+                        <input type="text" name="github" value="{{ data.personal_info.github }}" placeholder="GitHub URL">
+                        <input type="text" name="linkedin" value="{{ data.personal_info.linkedin }}" placeholder="LinkedIn URL">
+                        <textarea name="about_website" placeholder="About Website">{{ data.personal_info.about_website }}</textarea>
+                        
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">
+                                <i class="fas fa-image"></i> Profile Photo
+                            </label>
+                            {% if data.personal_info.profile_image %}
+                            <img src="{{ data.personal_info.profile_image }}" alt="Current Profile" style="max-width: 200px; max-height: 200px; border-radius: 12px; margin-bottom: 12px; display: block;">
+                            <input type="hidden" name="existing_profile_image" value="{{ data.personal_info.profile_image }}">
+                            {% endif %}
+                            <input type="file" name="profile_image" accept="image/*" style="display: block; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                            <small style="color: var(--text-secondary); display: block; margin-top: 4px;">Accepted formats: PNG, JPG, JPEG, GIF, WEBP (Max 16MB)</small>
+                        </div>
+                        
+                        <button type="submit"><i class="fas fa-save"></i> Save Changes</button>
+                    </form>
+                </div>
+
+                <!-- Skills/Hobbies Section -->
+                <div class="section-container">
+                    <h2><i class="fas fa-code"></i> Skills / Hobbies</h2>
+                    <form id="skillsForm" class="dashboard-form">
+                        <div id="skillsList" class="content-list">
+                            {% for skill in data.skills %}
+                            <div class="content-item editable-item" data-id="{{ skill.id }}" data-section="skills">
+                                <div class="item-content">
+                                    <h4 class="item-title">{{ skill.title }}</h4>
+                                    <p class="item-description">{{ skill.description }}</p>
+                                </div>
+                                <div class="item-edit-form" style="display: none;">
+                                    <input type="text" class="edit-title" value="{{ skill.title }}" placeholder="Title">
+                                    <textarea class="edit-description" placeholder="Description">{{ skill.description }}</textarea>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" class="edit-btn" onclick="toggleEdit(this)">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button type="button" class="delete-btn" onclick="markForDelete(this)">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 20px; background: var(--bg-secondary); border-radius: 8px;">
+                            <h4 style="margin-bottom: 12px;"><i class="fas fa-plus-circle"></i> Add New Skill</h4>
+                            <input type="text" id="newSkillTitle" placeholder="New Skill Title" style="width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                            <textarea id="newSkillDescription" placeholder="New Skill Description" style="width: 100%; padding: 12px; min-height: 80px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;"></textarea>
+                            <button type="button" onclick="addNewSkill()" style="margin-top: 12px; padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <i class="fas fa-plus"></i> Add to List
+                            </button>
+                        </div>
+                        
+                        <button type="button" onclick="saveSkills()" style="margin-top: 20px; width: 100%;">
+                            <i class="fas fa-save"></i> Save All Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tech Stack Section -->
+                <div class="section-container">
+                    <h2><i class="fas fa-laptop-code"></i> Tech Stack</h2>
+                    <form id="techForm" class="dashboard-form">
+                        <div id="techList" class="content-list">
+                            {% for tech in data.tech_stack %}
+                            <div class="content-item editable-item" data-id="{{ tech.id }}" data-section="tech" data-image="{{ tech.image_url or '' }}">
+                                <div class="item-content">
+                                    {% if tech.image_url %}
+                                    <img src="{{ tech.image_url }}" alt="{{ tech.title }}" style="max-width: 60px; max-height: 60px; border-radius: 8px; margin-bottom: 8px;">
+                                    {% endif %}
+                                    <h4 class="item-title">{{ tech.title }}</h4>
+                                    <p class="item-description">{{ tech.description }}</p>
+                                </div>
+                                <div class="item-edit-form" style="display: none;">
+                                    <input type="text" class="edit-title" value="{{ tech.title }}" placeholder="Title">
+                                    <textarea class="edit-description" placeholder="Description">{{ tech.description }}</textarea>
+                                    <div style="margin-top: 12px;">
+                                        <label style="display: block; margin-bottom: 4px; font-weight: 600; font-size: 14px;"><i class="fas fa-image"></i> Tech Logo</label>
+                                        {% if tech.image_url %}
+                                        <img src="{{ tech.image_url }}" alt="Current Logo" style="max-width: 60px; max-height: 60px; border-radius: 8px; margin-bottom: 8px; display: block;">
+                                        {% endif %}
+                                        <input type="file" class="edit-image" accept="image/*" style="display: block; padding: 8px; border: 2px solid var(--bg-gradient-end); border-radius: 6px; font-size: 13px;">
+                                        <small style="color: var(--text-secondary); display: block; margin-top: 4px;">PNG, JPG, JPEG, GIF, WEBP (Max 16MB)</small>
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" class="edit-btn" onclick="toggleEdit(this)">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button type="button" class="delete-btn" onclick="markForDelete(this)">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 20px; background: var(--bg-secondary); border-radius: 8px;">
+                            <h4 style="margin-bottom: 12px;"><i class="fas fa-plus-circle"></i> Add New Tech</h4>
+                            <input type="text" id="newTechTitle" placeholder="New Tech Title" style="width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                            <textarea id="newTechDescription" placeholder="New Tech Description" style="width: 100%; padding: 12px; min-height: 80px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit; margin-bottom: 12px;"></textarea>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;"><i class="fas fa-image"></i> Tech Logo (Optional)</label>
+                                <input type="file" id="newTechImage" accept="image/*" style="display: block; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                                <small style="color: var(--text-secondary); display: block; margin-top: 4px;">PNG, JPG, JPEG, GIF, WEBP (Max 16MB)</small>
+                            </div>
+                            <button type="button" onclick="addNewTech()" style="margin-top: 12px; padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <i class="fas fa-plus"></i> Add to List
+                            </button>
+                        </div>
+                        
+                        <button type="button" onclick="saveTech()" style="margin-top: 20px; width: 100%;">
+                            <i class="fas fa-save"></i> Save All Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Projects Section -->
+                <div class="section-container">
+                    <h2><i class="fas fa-project-diagram"></i> Projects</h2>
+                    <form id="projectsForm" class="dashboard-form" enctype="multipart/form-data">
+                        <div id="projectsList" class="content-list">
+                            {% for project in data.projects %}
+                            <div class="content-item editable-item" data-id="{{ project.id }}" data-section="projects" data-image="{{ project.image_url or '' }}">
+                                <div class="item-content">
+                                    {% if project.image_url %}
+                                    <img src="{{ project.image_url }}" alt="{{ project.title }}" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-bottom: 8px;">
+                                    {% endif %}
+                                    <h4 class="item-title">{{ project.title }}</h4>
+                                    <p class="item-description">{{ project.description }}</p>
+                                </div>
+                                <div class="item-edit-form" style="display: none;">
+                                    <input type="text" class="edit-title" value="{{ project.title }}" placeholder="Project Title">
+                                    <textarea class="edit-description" placeholder="Project Description">{{ project.description }}</textarea>
+                                    <div style="margin-top: 12px;">
+                                        <label style="display: block; font-weight: 600; margin-bottom: 4px;"><i class="fas fa-image"></i> Project Image</label>
+                                        <input type="file" class="edit-image" accept="image/*" style="padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                                        <small style="display: block; color: var(--text-secondary); margin-top: 4px;">Leave empty to keep current image</small>
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" class="edit-btn" onclick="toggleEdit(this)">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button type="button" class="delete-btn" onclick="markForDelete(this)">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 20px; background: var(--bg-secondary); border-radius: 8px;">
+                            <h4 style="margin-bottom: 12px;"><i class="fas fa-plus-circle"></i> Add New Project</h4>
+                            <input type="text" id="newProjectTitle" placeholder="New Project Title" style="width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                            <textarea id="newProjectDescription" placeholder="New Project Description" style="width: 100%; padding: 12px; min-height: 80px; margin-bottom: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;"></textarea>
+                            <label style="display: block; font-weight: 600; margin-bottom: 4px;"><i class="fas fa-image"></i> Project Image</label>
+                            <input type="file" id="newProjectImage" accept="image/*" style="display: block; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px; margin-bottom: 12px;">
+                            <button type="button" onclick="addNewProject()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <i class="fas fa-plus"></i> Add to List
+                            </button>
+                        </div>
+                        
+                        <button type="button" onclick="saveProjects()" style="margin-top: 20px; width: 100%;">
+                            <i class="fas fa-save"></i> Save All Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings" style="margin-top: 40px;">
+                    <h2 style="margin-bottom: 24px; color: var(--text-primary);"><i class="fas fa-cog"></i> Settings</h2>
+                    
+                    <div class="section-container">
+                        <h2><i class="fas fa-user-edit"></i> Change Username</h2>
+                        <form action="/admin/change-username" method="POST" class="dashboard-form">
+                            <input type="text" name="new_username" placeholder="New Username" required>
+                            <button type="submit"><i class="fas fa-save"></i> Update Username</button>
+                        </form>
+                    </div>
+
+                    <div class="section-container">
+                        <h2><i class="fas fa-lock"></i> Change Password</h2>
+                        <form action="/admin/change-password" method="POST" class="dashboard-form">
+                            <input type="password" name="new_password" placeholder="New Password" required>
+                            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                            <button type="submit"><i class="fas fa-save"></i> Update Password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme selection handler
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                document.querySelectorAll('.theme-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                // Add active class to clicked option
+                this.classList.add('active');
+            });
+        });
+
+        // Toggle edit mode for an item
+        function toggleEdit(button) {
+            const item = button.closest('.editable-item');
+            const content = item.querySelector('.item-content');
+            const editForm = item.querySelector('.item-edit-form');
+            const editBtn = item.querySelector('.edit-btn');
+            
+            if (editForm.style.display === 'none') {
+                // Show edit form
+                content.style.display = 'none';
+                editForm.style.display = 'block';
+                editBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+                editBtn.style.background = '#6b7280';
+            } else {
+                // Save changes to display (not database yet)
+                const title = editForm.querySelector('.edit-title').value;
+                const description = editForm.querySelector('.edit-description').value;
+                
+                item.querySelector('.item-title').textContent = title;
+                item.querySelector('.item-description').textContent = description;
+                
+                // Hide edit form
+                content.style.display = 'block';
+                editForm.style.display = 'none';
+                editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+                editBtn.style.background = '#3b82f6';
+            }
+        }
+        
+        // Mark item for deletion (visual only until save)
+        function markForDelete(button) {
+            const item = button.closest('.editable-item');
+            if (item.classList.contains('marked-delete')) {
+                // Undo delete
+                item.classList.remove('marked-delete');
+                item.style.opacity = '1';
+                item.style.background = '';
+                button.innerHTML = '<i class="fas fa-trash"></i> Delete';
+            } else {
+                // Mark for delete
+                item.classList.add('marked-delete');
+                item.style.opacity = '0.5';
+                item.style.background = '#fee2e2';
+                button.innerHTML = '<i class="fas fa-undo"></i> Undo';
+            }
+        }
+        
+        // Add new skill
+        function addNewSkill() {
+            const title = document.getElementById('newSkillTitle').value.trim();
+            const description = document.getElementById('newSkillDescription').value.trim();
+            
+            if (!title || !description) {
+                alert('Please fill in both title and description');
+                return;
+            }
+            
+            const skillsList = document.getElementById('skillsList');
+            const newItem = document.createElement('div');
+            newItem.className = 'content-item editable-item';
+            newItem.setAttribute('data-id', 'new');
+            newItem.setAttribute('data-section', 'skills');
+            newItem.innerHTML = `
+                <div class="item-content">
+                    <h4 class="item-title">${title}</h4>
+                    <p class="item-description">${description}</p>
+                </div>
+                <div class="item-edit-form" style="display: none;">
+                    <input type="text" class="edit-title" value="${title}" placeholder="Title">
+                    <textarea class="edit-description" placeholder="Description">${description}</textarea>
+                </div>
+                <div class="item-actions">
+                    <button type="button" class="edit-btn" onclick="toggleEdit(this)">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button type="button" class="delete-btn" onclick="markForDelete(this)">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            skillsList.appendChild(newItem);
+            
+            // Clear inputs
+            document.getElementById('newSkillTitle').value = '';
+            document.getElementById('newSkillDescription').value = '';
+        }
+        
+        // Add new tech
+        function addNewTech() {
+            const title = document.getElementById('newTechTitle').value.trim();
+            const description = document.getElementById('newTechDescription').value.trim();
+            const imageInput = document.getElementById('newTechImage');
+            
+            if (!title || !description) {
+                alert('Please fill in both title and description');
+                return;
+            }
+            
+            const techList = document.getElementById('techList');
+            const newItem = document.createElement('div');
+            newItem.className = 'content-item editable-item';
+            newItem.setAttribute('data-id', 'new');
+            newItem.setAttribute('data-section', 'tech');
+            newItem.setAttribute('data-image', '');
+            
+            // Preview image if uploaded
+            let imagePreview = '';
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = newItem.querySelector('.item-content img');
+                    if (img) {
+                        img.src = e.target.result;
+                    } else {
+                        newItem.querySelector('.item-content').insertAdjacentHTML('afterbegin', 
+                            `<img src="${e.target.result}" alt="${title}" style="max-width: 60px; max-height: 60px; border-radius: 8px; margin-bottom: 8px;">`);
+                    }
+                };
+                reader.readAsDataURL(imageInput.files[0]);
+                imagePreview = '<img src="" alt="Loading..." style="max-width: 60px; max-height: 60px; border-radius: 8px; margin-bottom: 8px;">';
+            }
+            
+            newItem.innerHTML = `
+                <div class="item-content">
+                    ${imagePreview}
+                    <h4 class="item-title">${title}</h4>
+                    <p class="item-description">${description}</p>
+                </div>
+                <div class="item-edit-form" style="display: none;">
+                    <input type="text" class="edit-title" value="${title}" placeholder="Title">
+                    <textarea class="edit-description" placeholder="Description">${description}</textarea>
+                    <div style="margin-top: 12px;">
+                        <label style="display: block; margin-bottom: 4px; font-weight: 600; font-size: 14px;"><i class="fas fa-image"></i> Tech Logo</label>
+                        <input type="file" class="edit-image" accept="image/*" style="display: block; padding: 8px; border: 2px solid var(--bg-gradient-end); border-radius: 6px; font-size: 13px;">
+                        <small style="color: var(--text-secondary); display: block; margin-top: 4px;">PNG, JPG, JPEG, GIF, WEBP (Max 16MB)</small>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button type="button" class="edit-btn" onclick="toggleEdit(this)">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button type="button" class="delete-btn" onclick="markForDelete(this)">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            
+            // Store the file in the element for later upload
+            if (imageInput.files && imageInput.files[0]) {
+                const fileInput = newItem.querySelector('.edit-image');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(imageInput.files[0]);
+                fileInput.files = dataTransfer.files;
+            }
+            
+            techList.appendChild(newItem);
+            
+            document.getElementById('newTechTitle').value = '';
+            document.getElementById('newTechDescription').value = '';
+            document.getElementById('newTechImage').value = '';
+        }
+        
+        // Add new project
+        function addNewProject() {
+            const title = document.getElementById('newProjectTitle').value.trim();
+            const description = document.getElementById('newProjectDescription').value.trim();
+            const imageInput = document.getElementById('newProjectImage');
+            
+            if (!title || !description) {
+                alert('Please fill in both title and description');
+                return;
+            }
+            
+            const projectsList = document.getElementById('projectsList');
+            const newItem = document.createElement('div');
+            newItem.className = 'content-item editable-item';
+            newItem.setAttribute('data-id', 'new');
+            newItem.setAttribute('data-section', 'projects');
+            newItem.innerHTML = `
+                <div class="item-content">
+                    <h4 class="item-title">${title}</h4>
+                    <p class="item-description">${description}</p>
+                </div>
+                <div class="item-edit-form" style="display: none;">
+                    <input type="text" class="edit-title" value="${title}" placeholder="Project Title">
+                    <textarea class="edit-description" placeholder="Project Description">${description}</textarea>
+                    <div style="margin-top: 12px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 4px;"><i class="fas fa-image"></i> Project Image</label>
+                        <input type="file" class="edit-image" accept="image/*" style="padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button type="button" class="edit-btn" onclick="toggleEdit(this)">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button type="button" class="delete-btn" onclick="markForDelete(this)">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            projectsList.appendChild(newItem);
+            
+            // Store the image file if provided
+            if (imageInput.files.length > 0) {
+                newItem.setAttribute('data-new-image', 'true');
+                const editImageInput = newItem.querySelector('.edit-image');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(imageInput.files[0]);
+                editImageInput.files = dataTransfer.files;
+            }
+            
+            document.getElementById('newProjectTitle').value = '';
+            document.getElementById('newProjectDescription').value = '';
+            document.getElementById('newProjectImage').value = '';
+        }
+        
+        // Save all skills
+        function saveSkills() {
+            const items = document.querySelectorAll('#skillsList .editable-item');
+            const updates = [];
+            const deletes = [];
+            
+            items.forEach(item => {
+                const id = item.getAttribute('data-id');
+                
+                if (item.classList.contains('marked-delete')) {
+                    if (id !== 'new') {
+                        deletes.push(id);
+                    }
+                } else {
+                    const title = item.querySelector('.item-title').textContent;
+                    const description = item.querySelector('.item-description').textContent;
+                    updates.push({ id, title, description });
+                }
+            });
+            
+            submitBatchUpdate('/admin/batch-update-skills', updates, deletes);
+        }
+        
+        // Save all tech
+        function saveTech() {
+            const items = document.querySelectorAll('#techList .editable-item');
+            const updates = [];
+            const deletes = [];
+            const formData = new FormData();
+            
+            items.forEach(item => {
+                const id = item.getAttribute('data-id');
+                
+                if (item.classList.contains('marked-delete')) {
+                    if (id !== 'new') {
+                        deletes.push(id);
+                    }
+                } else {
+                    const title = item.querySelector('.item-title').textContent;
+                    const description = item.querySelector('.item-description').textContent;
+                    const image_url = item.getAttribute('data-image') || '';
+                    
+                    updates.push({ id, title, description, image_url });
+                    
+                    // Check if there's a new image
+                    const imageInput = item.querySelector('.edit-image');
+                    if (imageInput && imageInput.files && imageInput.files[0]) {
+                        formData.append(`tech_image_${id}`, imageInput.files[0]);
+                    }
+                }
+            });
+            
+            formData.append('updates', JSON.stringify(updates));
+            formData.append('deletes', JSON.stringify(deletes));
+            
+            fetch('/admin/batch-update-tech', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving');
+            });
+        }
+        
+        // Save all projects
+        function saveProjects() {
+            const items = document.querySelectorAll('#projectsList .editable-item');
+            const updates = [];
+            const deletes = [];
+            const formData = new FormData();
+            
+            items.forEach(item => {
+                const id = item.getAttribute('data-id');
+                
+                if (item.classList.contains('marked-delete')) {
+                    if (id !== 'new') {
+                        deletes.push(id);
+                    }
+                } else {
+                    const title = item.querySelector('.item-title').textContent;
+                    const description = item.querySelector('.item-description').textContent;
+                    const image_url = item.getAttribute('data-image') || '';
+                    
+                    updates.push({ id, title, description, image_url });
+                    
+                    // Check if there's a new image
+                    const imageInput = item.querySelector('.edit-image');
+                    if (imageInput && imageInput.files.length > 0) {
+                        formData.append(`project_image_${id}`, imageInput.files[0]);
+                    }
+                }
+            });
+            
+            formData.append('updates', JSON.stringify(updates));
+            formData.append('deletes', JSON.stringify(deletes));
+            
+            fetch('/admin/batch-update-projects', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error saving projects');
+                }
+            });
+        }
+        
+        // Submit batch update
+        function submitBatchUpdate(url, updates, deletes) {
+            const formData = new FormData();
+            formData.append('updates', JSON.stringify(updates));
+            formData.append('deletes', JSON.stringify(deletes));
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error saving changes');
+                }
+            });
+        }
+
+        // Theme scroll function
+        function scrollThemes(direction) {
+            const grid = document.getElementById('themeGrid');
+            const scrollAmount = 350;
+            if (direction === 'left') {
+                grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+    </script>
+
+</body>
+</html>
